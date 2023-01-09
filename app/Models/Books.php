@@ -8,5 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Books extends Model
 {
     use HasFactory;
-    protected $fillable = ['name', 'cover', 'price', 'description', 'stock', 'slug'];
+    protected $fillable = ['name', 'cover', 'price', 'description', 'stock', 'slug', 'user_id'];
+
+    public function user() {
+        return $this->belongsTo('App\Models\User');
+    }
+
 }

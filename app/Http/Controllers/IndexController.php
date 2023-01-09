@@ -11,7 +11,6 @@ class IndexController extends Controller
     public function index() {
 
         $books = Books::all();
-        
         return view('index');
     } 
 }

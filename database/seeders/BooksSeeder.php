@@ -15,13 +15,6 @@ class BooksSeeder extends Seeder
      */
     public function run()
     {
-        Books::factory(10)->create();
-        // $books = new Books();
-        // $books->name = 'Teste';
-        // $books->cover = 'Teste';
-        // $books->price = '1.11';
-        // $books->description = 'TesteTesteTesteTesteTesteTesteTesteTesteTesteTesteTesteTeste';
-        // $books->stock = '2';
-        // $books->save();
+        Books::factory(40)->create();
     }
 }

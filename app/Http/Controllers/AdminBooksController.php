@@ -4,28 +4,47 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Books;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
 
 class AdminBooksController extends Controller
 {
 
-    public function index() {
-        $books = Books::all();
+    public function index(Request $request) {
+        
+        $books = Books::query();
+
+        $books->when($request->search, function ($query, $sr) {
+            $query->where('name', 'like', '%' . $sr . '%');
+        });
+
+        $books = $books->paginate(5);
+
         return view('admin.books', [
             'books' => $books
         ]);
     }
 
-    public function edit() {
-        $books = Books::all();
+    public function edit(Books $books) {
+
         return view('admin.books_edit', [
             'books' => $books
         ]);
     }
 
-    public function update() {
-        return view('admin.books_edit');
+    public function update(Books $books, Request $request) {
+        $input = $request->validate([
+            'name' => 'string|required',
+            'price' => 'string|required',
+            'stock' => 'integer|nullable',
+            'cover' => 'url|nullable',
+            'description' => 'string|nullable'
+        ]);
+        $books->fill($input);
+        $books->save();
+    
+        return Redirect::route('admin.books');
     }
 
     public function create() {
@@ -37,19 +56,23 @@ class AdminBooksController extends Controller
             'name' => 'string|required',
             'price' => 'string|required',
             'stock' => 'integer|nullable',
-            'cover' => 'file|nullable',
-            'description' => 'string|nullable'
+            'cover' => 'url|nullable',
+            'description' => 'string|nullable',
         ]);
         $input['slug'] = Str::slug($input['name']);
 
-        if ( !empty($input['cover']) && $input['cover']->isValid()) {
-            $file = $input['cover'];
-            $path = $file->store('public/img');
-            $input['cover'] = $path;
-        }
+        $input['user_id'] = Auth::user()->id;
         
         Books::create($input);
 
-        return Redirect::route('admin.books.create');
+        return Redirect::route('admin.books');
+
+    }
+
+    public function destroy(Books $books) {
+        $books->delete();
+
+        return Redirect::route('admin.books');
+        
     }
 }
